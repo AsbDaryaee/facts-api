@@ -111,25 +111,16 @@ GET /api/facts/search?q=dinosaur
 
 ```typescript
 interface Fact {
-    id: number;
-    category: Categories;
-    title: string;
-    fact: string;
-    verified: boolean;
-    source: string;
-    year_discovered: number;
-    interesting_rating: number;
+  id: number;
+  category: Categories;
+  title: string;
+  fact: string;
+  verified: boolean;
+  source: string;
+  year_discovered: number;
+  interesting_rating: number;
 }
 ```
-
-## Implementation Notes
-
-This API is built on top of the FactsService, which provides the core functionality for retrieving and filtering facts. The endpoints map directly to the service methods:
-
-- `GET /api/facts` → `FactsService.getAllFacts()`
-- `GET /api/facts/:id` → `FactsService.getFactById()`
-- `GET /api/facts/category/:category` → `FactsService.getFactsByCategory()`
-- `GET /api/facts/search` → `FactsService.searchFacts()`
 
 ## 📝 Data Attribution
 
