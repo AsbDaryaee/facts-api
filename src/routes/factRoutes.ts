@@ -28,6 +28,11 @@ export async function factsRouter(req: Request): Promise<Response> {
         return FactsController.searchFacts(req);
     }
 
+    // GET /api/facts/random - Random fact
+    if (path === "/api/facts/random" && method === "GET") {
+        return FactsController.randomFact(req);
+    }
+
     // Handle 404 Not Found
     return new Response("Not Found", { status: 404 });
 }

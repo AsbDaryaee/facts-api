@@ -44,4 +44,10 @@ export class FactsService {
             fact.category.toLowerCase().includes(lowercaseQuery)
         );
     }
+
+    // Random fact
+    static randomFact(): Fact {
+        const randomFactIndex = Math.floor(Math.random() * facts.length)
+        return facts[randomFactIndex]!
+    }
 }

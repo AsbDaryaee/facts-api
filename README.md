@@ -39,6 +39,36 @@ Retrieves a list of facts with optional filtering.
 GET /api/facts?limit=5&verified=true
 ```
 
+### Get Random Fact
+
+Retrieves a single random fact from the facts collection.
+
+**URL:** `/api/facts/random`  
+**Method:** `GET`
+
+**Success Response:**
+
+- **Code:** 200
+- **Content:** Single Fact object
+
+**Example Request:**
+
+```
+GET /api/facts/random
+```
+
+**Example Response:**
+
+```json
+{
+  "id": 15,
+  "title": "Octopus Intelligence",
+  "fact": "Octopuses are highly intelligent and have been observed using tools, solving puzzles, and even escaping from aquariums.",
+  "category": "animals",
+  "verified": true
+}
+```
+
 ### Get Fact by ID
 
 Retrieves a specific fact by its ID.

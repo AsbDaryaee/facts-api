@@ -62,5 +62,15 @@ export class FactsController {
             return Response.json({ error: "Failed to search facts" }, { status: 500 });
         }
     }
+
+    // Random fact
+    static async randomFact(req: Request): Promise<Response> {
+        try {
+            const facts = FactsService.randomFact()
+            return Response.json(facts);
+        } catch (error) {
+            return Response.json({ error: "Failed to search facts" }, { status: 500 });
+        }
+    }
 }
 
