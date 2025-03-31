@@ -6,10 +6,17 @@ import { config } from "./src/config";
 const server = Bun.serve({
     port: process.env.PORT || 3000,
     async fetch(req) {
+        const url = new URL(req.url);
+
+
         if (config.logger) logger(req);
 
         const corsResponse = cors(req);
         if (corsResponse) return corsResponse;
+
+        if (url.pathname === "/" || url.pathname === "/index.html") {
+            return new Response(Bun.file(import.meta.dir + "/public/html/index.html"));
+        }
 
         // Route handling
         return factsRouter(req);

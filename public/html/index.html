@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facts API Showcase</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.0/cdn.min.js"
+      defer
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50">
+    <div
+      class="container mx-auto p-4 max-w-6xl"
+      x-data="{
+activeTab: 'all',
+facts: [],
+randomFact: null,
+selectedFact: null,
+categoryFacts: [],
+searchResults: [],
+
+// Input state
+factId: '',
+category: '',
+searchQuery: '',
+limit: 5,
+verifiedOnly: false,
+
+// API calls
+async fetchAllFacts() {
+try {
+const response = await fetch(`/api/facts?limit=${this.limit}${this.verifiedOnly ? '&verified=true' : ''}`);
+if (!response.ok) throw new Error('Failed to fetch facts');
+this.facts = await response.json();
+} catch (error) {
+console.error('Error fetching facts:', error);
+this.facts = [];
+}
+},
+
+async fetchRandomFact() {
+try {
+const response = await fetch('/api/facts/random');
+if (!response.ok) throw new Error('Failed to fetch random fact');
+this.randomFact = await response.json();
+} catch (error) {
+console.error('Error fetching random fact:', error);
+this.randomFact = null;
+}
+},
+
+async fetchFactById() {
+if (!this.factId) return;
+try {
+const response = await fetch(`/api/facts/${this.factId}`);
+if (!response.ok) throw new Error('Failed to fetch fact by ID');
+this.selectedFact = await response.json();
+} catch (error) {
+console.error('Error fetching fact by ID:', error);
+this.selectedFact = null;
+}
+},
+
+async fetchFactsByCategory() {
+if (!this.category) return;
+try {
+const response = await fetch(`/api/facts/category/${this.category}`);
+if (!response.ok) throw new Error('Failed to fetch facts by category');
+this.categoryFacts = await response.json();
+} catch (error) {
+console.error('Error fetching facts by category:', error);
+this.categoryFacts = [];
+}
+},
+
+async searchFacts() {
+if (!this.searchQuery) return;
+try {
+const response = await fetch(`/api/facts/search?q=${encodeURIComponent(this.searchQuery)}`);
+if (!response.ok) throw new Error('Failed to search facts');
+this.searchResults = await response.json();
+} catch (error) {
+console.error('Error searching facts:', error);
+this.searchResults = [];
+}
+},
+
+setTab(tab) {
+this.activeTab = tab;
+if (tab === 'all') {
+this.fetchAllFacts();
+} else if (tab === 'random') {
+this.fetchRandomFact();
+}
+}
+}"
+      x-init="fetchAllFacts()"
+    >
+      <h1 class="text-3xl font-bold text-center mb-2">Facts API Showcase</h1>
+      <div class="w-full text-center mb-4">
+        This API provides access to a curated collection of 200 fascinating
+        facts across six categories!
+      </div>
+
+      <!-- Tabs -->
+      <div class="border-b border-gray-200 mb-6">
+        <ul class="flex flex-wrap -mb-px">
+          <li class="mr-2">
+            <button
+              @click="setTab('all')"
+              :class="activeTab === 'all' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
+              class="inline-block p-4"
+            >
+              All Facts
+            </button>
+          </li>
+          <li class="mr-2">
+            <button
+              @click="setTab('random')"
+              :class="activeTab === 'random' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
+              class="inline-block p-4"
+            >
+              Random Fact
+            </button>
+          </li>
+          <li class="mr-2">
+            <button
+              @click="setTab('byId')"
+              :class="activeTab === 'byId' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
+              class="inline-block p-4"
+            >
+              Fact by ID
+            </button>
+          </li>
+          <li class="mr-2">
+            <button
+              @click="setTab('byCategory')"
+              :class="activeTab === 'byCategory' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
+              class="inline-block p-4"
+            >
+              Facts by Category
+            </button>
+          </li>
+          <li>
+            <button
+              @click="setTab('search')"
+              :class="activeTab === 'search' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
+              class="inline-block p-4"
+            >
+              Search Facts
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="w-full grid lg:grid-cols-2 gap-4">
+        <section>
+          <!-- All Facts Tab -->
+          <div x-show="activeTab === 'all'">
+            <div class="mb-6 bg-gray-100 p-4 rounded-lg">
+              <h2 class="text-xl font-semibold mb-4">Get All Facts</h2>
+              <div class="flex flex-wrap gap-4 mb-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Limit</label
+                  >
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    x-model="limit"
+                    class="px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div class="flex items-end">
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      x-model="verifiedOnly"
+                      class="h-4 w-4 mr-2"
+                    />
+                    <span class="text-sm font-medium text-gray-700"
+                      >Verified Only</span
+                    >
+                  </label>
+                </div>
+                <div class="flex items-end">
+                  <button
+                    @click="fetchAllFacts()"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  >
+                    Fetch Facts
+                  </button>
+                </div>
+              </div>
+              <div class="text-sm text-gray-500">
+                <code
+                  x-text="`GET /api/facts?limit=${limit}${verifiedOnly ? '&verified=true' : ''}`"
+                ></code>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <h3
+                class="text-lg font-semibold mb-2"
+                x-text="`Results (${facts.length} facts)`"
+              ></h3>
+              <template x-if="facts.length > 0">
+                <div class="space-y-4">
+                  <template x-for="fact in facts" :key="fact.id">
+                    <div
+                      class="bg-white rounded-lg shadow-md p-4 border border-gray-200"
+                    >
+                      <h3
+                        class="text-lg font-semibold text-blue-600"
+                        x-text="fact.title"
+                      ></h3>
+                      <p class="my-2" x-text="fact.fact"></p>
+                      <div class="flex justify-between items-center mt-2">
+                        <span
+                          class="bg-gray-100 px-2 py-1 rounded text-sm"
+                          x-text="fact.category"
+                        ></span>
+                        <span
+                          :class="fact.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                          class="px-2 py-1 rounded text-sm"
+                          x-text="fact.verified ? 'Verified' : 'Unverified'"
+                        >
+                        </span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <template x-if="facts.length === 0">
+                <p class="text-gray-500">
+                  No facts found. Try adjusting your filters or fetching facts.
+                </p>
+              </template>
+            </div>
+          </div>
+
+          <!-- Random Fact Tab -->
+          <div x-show="activeTab === 'random'">
+            <div class="mb-6 bg-gray-100 p-4 rounded-lg">
+              <h2 class="text-xl font-semibold mb-4">Get Random Fact</h2>
+              <button
+                @click="fetchRandomFact()"
+                class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              >
+                Get Another Random Fact
+              </button>
+              <div class="mt-2 text-sm text-gray-500">
+                <code>GET /api/facts/random</code>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <template x-if="randomFact">
+                <div
+                  class="bg-white rounded-lg shadow-md p-4 border border-gray-200"
+                >
+                  <h3
+                    class="text-lg font-semibold text-blue-600"
+                    x-text="randomFact.title"
+                  ></h3>
+                  <p class="my-2" x-text="randomFact.fact"></p>
+                  <div class="flex justify-between items-center mt-2">
+                    <span
+                      class="bg-gray-100 px-2 py-1 rounded text-sm"
+                      x-text="randomFact.category"
+                    ></span>
+                    <span
+                      :class="randomFact.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                      class="px-2 py-1 rounded text-sm"
+                      x-text="randomFact.verified ? 'Verified' : 'Unverified'"
+                    >
+                    </span>
+                  </div>
+                </div>
+              </template>
+              <template x-if="!randomFact">
+                <p class="text-gray-500">
+                  Click the button to get a random fact.
+                </p>
+              </template>
+            </div>
+          </div>
+
+          <!-- Fact by ID Tab -->
+          <div x-show="activeTab === 'byId'">
+            <div class="mb-6 bg-gray-100 p-4 rounded-lg">
+              <h2 class="text-xl font-semibold mb-4">Get Fact by ID</h2>
+              <div class="flex gap-4 mb-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Fact ID</label
+                  >
+                  <input
+                    type="number"
+                    min="1"
+                    x-model="factId"
+                    class="px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div class="flex items-end">
+                  <button
+                    @click="fetchFactById()"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    :disabled="!factId"
+                  >
+                    Fetch Fact
+                  </button>
+                </div>
+              </div>
+              <div class="text-sm text-gray-500">
+                <code x-text="`GET /api/facts/${factId || ':id'}`"></code>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <template x-if="selectedFact">
+                <div
+                  class="bg-white rounded-lg shadow-md p-4 border border-gray-200"
+                >
+                  <h3
+                    class="text-lg font-semibold text-blue-600"
+                    x-text="selectedFact.title"
+                  ></h3>
+                  <p class="my-2" x-text="selectedFact.fact"></p>
+                  <div class="flex justify-between items-center mt-2">
+                    <span
+                      class="bg-gray-100 px-2 py-1 rounded text-sm"
+                      x-text="selectedFact.category"
+                    ></span>
+                    <span
+                      :class="selectedFact.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                      class="px-2 py-1 rounded text-sm"
+                      x-text="selectedFact.verified ? 'Verified' : 'Unverified'"
+                    >
+                    </span>
+                  </div>
+                </div>
+              </template>
+              <template x-if="!selectedFact">
+                <p class="text-gray-500">
+                  Enter an ID and click "Fetch Fact" to get a specific fact.
+                </p>
+              </template>
+            </div>
+          </div>
+
+          <!-- Facts by Category Tab -->
+          <div x-show="activeTab === 'byCategory'">
+            <div class="mb-6 bg-gray-100 p-4 rounded-lg">
+              <h2 class="text-xl font-semibold mb-4">Get Facts by Category</h2>
+              <div class="flex gap-4 mb-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Category</label
+                  >
+                  <input
+                    type="text"
+                    x-model="category"
+                    placeholder="e.g. science, history"
+                    class="px-3 py-2 border border-gray-300 rounded-md w-64"
+                  />
+                </div>
+                <div class="flex items-end">
+                  <button
+                    @click="fetchFactsByCategory()"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    :disabled="!category"
+                  >
+                    Fetch Facts
+                  </button>
+                </div>
+              </div>
+              <div class="text-sm text-gray-500">
+                <code
+                  x-text="`GET /api/facts/category/${category || ':category'}`"
+                ></code>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <h3
+                class="text-lg font-semibold mb-2"
+                x-text="`Results (${categoryFacts.length} facts)`"
+              ></h3>
+              <template x-if="categoryFacts.length > 0">
+                <div class="space-y-4">
+                  <template x-for="fact in categoryFacts" :key="fact.id">
+                    <div
+                      class="bg-white rounded-lg shadow-md p-4 border border-gray-200"
+                    >
+                      <h3
+                        class="text-lg font-semibold text-blue-600"
+                        x-text="fact.title"
+                      ></h3>
+                      <p class="my-2" x-text="fact.fact"></p>
+                      <div class="flex justify-between items-center mt-2">
+                        <span
+                          class="bg-gray-100 px-2 py-1 rounded text-sm"
+                          x-text="fact.category"
+                        ></span>
+                        <span
+                          :class="fact.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                          class="px-2 py-1 rounded text-sm"
+                          x-text="fact.verified ? 'Verified' : 'Unverified'"
+                        >
+                        </span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <template x-if="categoryFacts.length === 0">
+                <p class="text-gray-500">
+                  Enter a category and click "Fetch Facts" to get facts for that
+                  category.
+                </p>
+              </template>
+            </div>
+          </div>
+
+          <!-- Search Facts Tab -->
+          <div x-show="activeTab === 'search'">
+            <div class="mb-6 bg-gray-100 p-4 rounded-lg">
+              <h2 class="text-xl font-semibold mb-4">Search Facts</h2>
+              <div class="flex gap-4 mb-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Search Query</label
+                  >
+                  <input
+                    type="text"
+                    x-model="searchQuery"
+                    placeholder="Enter search terms..."
+                    class="px-3 py-2 border border-gray-300 rounded-md w-64"
+                  />
+                </div>
+                <div class="flex items-end">
+                  <button
+                    @click="searchFacts()"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    :disabled="!searchQuery"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+              <div class="text-sm text-gray-500">
+                <code
+                  x-text="`GET /api/facts/search?q=${searchQuery || ':query'}`"
+                ></code>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <h3
+                class="text-lg font-semibold mb-2"
+                x-text="`Results (${searchResults.length} facts)`"
+              ></h3>
+              <template x-if="searchResults.length > 0">
+                <div class="space-y-4">
+                  <template x-for="fact in searchResults" :key="fact.id">
+                    <div
+                      class="bg-white rounded-lg shadow-md p-4 border border-gray-200"
+                    >
+                      <h3
+                        class="text-lg font-semibold text-blue-600"
+                        x-text="fact.title"
+                      ></h3>
+                      <p class="my-2" x-text="fact.fact"></p>
+                      <div class="flex justify-between items-center mt-2">
+                        <span
+                          class="bg-gray-100 px-2 py-1 rounded text-sm"
+                          x-text="fact.category"
+                        ></span>
+                        <span
+                          :class="fact.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                          class="px-2 py-1 rounded text-sm"
+                          x-text="fact.verified ? 'Verified' : 'Unverified'"
+                        >
+                        </span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <template x-if="searchResults.length === 0">
+                <p class="text-gray-500">
+                  Enter search terms and click "Search" to find matching facts.
+                </p>
+              </template>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <!-- API Documentation -->
+          <div class="p-4 bg-gray-100 rounded-lg">
+            <h2 class="text-xl font-semibold mb-4">API Endpoints</h2>
+            <div class="space-y-4">
+              <div>
+                <h3 class="font-semibold">Get All Facts</h3>
+                <code class="block bg-gray-200 p-2 rounded"
+                  >GET /api/facts?limit=:limit&verified=:verified</code
+                >
+              </div>
+              <div>
+                <h3 class="font-semibold">Get Random Fact</h3>
+                <code class="block bg-gray-200 p-2 rounded"
+                  >GET /api/facts/random</code
+                >
+              </div>
+              <div>
+                <h3 class="font-semibold">Get Fact by ID</h3>
+                <code class="block bg-gray-200 p-2 rounded"
+                  >GET /api/facts/:id</code
+                >
+              </div>
+              <div>
+                <h3 class="font-semibold">Get Facts by Category</h3>
+                <code class="block bg-gray-200 p-2 rounded"
+                  >GET /api/facts/category/:category</code
+                >
+              </div>
+              <div>
+                <h3 class="font-semibold">Search Facts</h3>
+                <code class="block bg-gray-200 p-2 rounded"
+                  >GET /api/facts/search?q=:query</code
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- API TYPES -->
+          <div class="p-4 bg-gray-100 rounded-lg space-y-4">
+            <h2 class="text-xl font-semibold mb-4">Types</h2>
+            <div class="space-y-4">
+              <div>
+                <h3 class="font-semibold">Facts</h3>
+                <code class="block bg-gray-200 p-2 rounded">
+                  <pre>
+interface Fact {
+        id: number;
+        category: Categories;
+        title: string;
+        fact: string;
+        verified: boolean;
+        source: string;
+        year_discovered: number;
+        interesting_rating: number;
+}
+</pre
+                  >
+                </code>
+              </div>
+            </div>
+            <div class="space-y-4 mt-4">
+              <div>
+                <h3 class="font-semibold">Categories</h3>
+                <code class="block bg-gray-200 p-2 rounded">
+                  <pre>
+export type Categories = 
+        "Astronomy" | 
+        'Biology' | 
+        'Physics' |
+        'Animals' | 
+        'History' | 
+        'Technology'
+</pre
+                  >
+                </code>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
