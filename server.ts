@@ -1,16 +1,13 @@
-// src/index.ts - Main entry point for the Bun Facts API server
 import { factsRouter } from "./src/routes/factRoutes";
 import { cors } from "./src/middlewares/cors";
 import { logger } from "./src/middlewares/logger";
+import { config } from "./src/config";
 
-// Initialize the server
 const server = Bun.serve({
     port: process.env.PORT || 3000,
     async fetch(req) {
-        // Apply middlewares
-        logger(req);
+        if (config.logger) logger(req);
 
-        // Handle CORS
         const corsResponse = cors(req);
         if (corsResponse) return corsResponse;
 
