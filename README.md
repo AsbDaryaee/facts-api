@@ -15,79 +15,121 @@ This API provides access to a curated collection of 200 fascinating facts across
 
 Each fact includes detailed metadata such as verification status, sources, discovery year, and interest rating.
 
-## 🚀 Features
+## Endpoints
 
-- **Fast Performance**: Built on Bun for lightning-fast response times
-- **RESTful Endpoints**: Clean API design following REST principles
-- **CORS Enabled**: Ready for cross-origin requests from browsers
-- **Detailed Logging**: Request tracking and error reporting
-- **Comprehensive Testing**: Test coverage for all endpoints
+### Get All Facts
 
-## 🏃‍♂️ Getting Started
+Retrieves a list of facts with optional filtering.
 
-### Prerequisites
+**URL:** `/api/facts`  
+**Method:** `GET`  
+**Query Parameters:**
 
-- [Bun](https://bun.sh/) installed on your machine
+- `limit` (optional): Maximum number of facts to return
+- `verified` (optional): Filter by verification status (true/false)
 
-### Installation
+**Success Response:**
 
-1. Clone the repository
+- **Code:** 200
+- **Content:** Array of Fact objects
 
-   ```bash
-   git clone https://github.com/asbdaryaee/facts-api.git
-   cd facts-api
-   ```
+**Example Request:**
 
-2. Install dependencies
-
-   ```bash
-   bun install
-   ```
-
-3. Run the server
-   ```bash
-   bun start
-   ```
-
-The server will be available at `http://localhost:3000` by default.
-
-## ⚙️ Configuration
-
-The API can be configured using environment variables:
-
-| Variable | Description              | Default |
-| -------- | ------------------------ | ------- |
-| `PORT`   | Server port              | 3000    |
-| `LOGGER` | Sets logger is on or off | blank   |
-
-Create a `.env` file in the root directory to set these values.
-
-## 🧪 Testing
-
-Run the test suite:
-
-```bash
-bun test
+```
+GET /api/facts?limit=5&verified=true
 ```
 
-## 🔄 Development Workflow
+### Get Fact by ID
 
-1. Start the development server with auto-reload:
+Retrieves a specific fact by its ID.
 
-   ```bash
-   bun dev
-   ```
+**URL:** `/api/facts/:id`  
+**Method:** `GET`  
+**URL Parameters:**
 
-2. Run tests:
+- `id`: The numeric ID of the fact
 
-   ```bash
-   bun test
-   ```
+**Success Response:**
 
-3. Build for production:
-   ```bash
-   bun run build
-   ```
+- **Code:** 200
+- **Content:** Fact object
+
+**Error Response:**
+
+- **Code:** 404
+- **Content:** `{ "error": "Fact not found" }`
+
+**Example Request:**
+
+```
+GET /api/facts/42
+```
+
+### Get Facts by Category
+
+Retrieves all facts belonging to a specific category.
+
+**URL:** `/api/facts/category/:category`  
+**Method:** `GET`  
+**URL Parameters:**
+
+- `category`: The category name
+
+**Success Response:**
+
+- **Code:** 200
+- **Content:** Array of Fact objects
+
+**Example Request:**
+
+```
+GET /api/facts/category/science
+```
+
+### Search Facts
+
+Searches for facts containing the specified query in title, content, or category.
+
+**URL:** `/api/facts/search`  
+**Method:** `GET`  
+**Query Parameters:**
+
+- `q`: The search query
+
+**Success Response:**
+
+- **Code:** 200
+- **Content:** Array of Fact objects
+
+**Example Request:**
+
+```
+GET /api/facts/search?q=dinosaur
+```
+
+## Fact Object Structure
+
+```typescript
+interface Fact {
+    id: number;
+    category: Categories;
+    title: string;
+    fact: string;
+    verified: boolean;
+    source: string;
+    year_discovered: number;
+    interesting_rating: number;
+}
+```
+
+## Implementation Notes
+
+This API is built on top of the FactsService, which provides the core functionality for retrieving and filtering facts. The endpoints map directly to the service methods:
+
+- `GET /api/facts` → `FactsService.getAllFacts()`
+- `GET /api/facts/:id` → `FactsService.getFactById()`
+- `GET /api/facts/category/:category` → `FactsService.getFactsByCategory()`
+- `GET /api/facts/search` → `FactsService.searchFacts()`
 
 ## 📝 Data Attribution
 
