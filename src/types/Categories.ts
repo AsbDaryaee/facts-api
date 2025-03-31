@@ -1,0 +1,1 @@
+export type Categories = "Astronomy" | 'Biology' | 'Physics' | 'Animals' | 'History' | 'Technology'

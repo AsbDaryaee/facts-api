@@ -1,0 +1,12 @@
+{
+  "name": "fact-api",
+  "module": "server.ts",
+  "type": "module",
+  "private": false,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
