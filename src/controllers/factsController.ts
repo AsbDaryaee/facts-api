@@ -1,4 +1,7 @@
 import { FactsService } from "../services/factsService";
+import { getHeaders } from "../utils/getHeaders";
+
+const { headers } = getHeaders()
 
 export class FactsController {
     // Get all facts
@@ -13,9 +16,11 @@ export class FactsController {
                 verified: verified === "true" ? true : verified === "false" ? false : undefined
             });
 
-            return Response.json(facts);
+            return Response.json(facts, {
+                headers
+            });
         } catch (error) {
-            return Response.json({ error: "Failed to get facts" }, { status: 500 });
+            return Response.json({ error: "Failed to get facts" }, { status: 500, headers });
         }
     }
 
@@ -25,12 +30,14 @@ export class FactsController {
             const fact = FactsService.getFactById(id);
 
             if (!fact) {
-                return Response.json({ error: "Fact not found" }, { status: 404 });
+                return Response.json({ error: "Fact not found" }, { status: 404, headers });
             }
 
-            return Response.json(fact);
+            return Response.json(fact, {
+                headers
+            });
         } catch (error) {
-            return Response.json({ error: "Failed to get fact" }, { status: 500 });
+            return Response.json({ error: "Failed to get fact" }, { status: 500, headers });
         }
     }
 
@@ -40,12 +47,14 @@ export class FactsController {
             const facts = FactsService.getFactsByCategory(category);
 
             if (facts.length === 0) {
-                return Response.json({ error: "No facts found for this category" }, { status: 404 });
+                return Response.json({ error: "No facts found for this category" }, { status: 404, headers });
             }
 
-            return Response.json(facts);
+            return Response.json(facts, {
+                headers
+            });
         } catch (error) {
-            return Response.json({ error: "Failed to get facts" }, { status: 500 });
+            return Response.json({ error: "Failed to get facts" }, { status: 500, headers });
         }
     }
 
@@ -57,9 +66,11 @@ export class FactsController {
 
             const facts = FactsService.searchFacts(query);
 
-            return Response.json(facts);
+            return Response.json(facts, {
+                headers
+            });
         } catch (error) {
-            return Response.json({ error: "Failed to search facts" }, { status: 500 });
+            return Response.json({ error: "Failed to search facts" }, { status: 500, headers });
         }
     }
 
@@ -67,9 +78,11 @@ export class FactsController {
     static async randomFact(req: Request): Promise<Response> {
         try {
             const facts = FactsService.randomFact()
-            return Response.json(facts);
+            return Response.json(facts, {
+                headers
+            });
         } catch (error) {
-            return Response.json({ error: "Failed to search facts" }, { status: 500 });
+            return Response.json({ error: "Failed to search facts" }, { status: 500, headers });
         }
     }
 }

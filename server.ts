@@ -1,5 +1,5 @@
 import { factsRouter } from "./src/routes/factRoutes";
-import { cors } from "./src/middlewares/cors";
+import { getOptoinsHeader } from "./src/middlewares/optionsHeader";
 import { logger } from "./src/middlewares/logger";
 import { config } from "./src/config";
 
@@ -10,7 +10,7 @@ const server = Bun.serve({
 
         if (config.logger) logger(req);
 
-        const corsResponse = cors(req);
+        const corsResponse = getOptoinsHeader(req);
         if (corsResponse) return corsResponse;
 
         // Route handling
