@@ -17,7 +17,10 @@ export class FactsController {
             });
 
             return Response.json(facts, {
-                headers
+                headers: {
+                    ...headers,
+                    "Cache-Control": "public, max-age=3600",
+                }
             });
         } catch (error) {
             return Response.json({ error: "Failed to get facts" }, { status: 500, headers });
@@ -34,7 +37,10 @@ export class FactsController {
             }
 
             return Response.json(fact, {
-                headers
+                headers: {
+                    ...headers,
+                    "Cache-Control": "public, max-age=3600",
+                }
             });
         } catch (error) {
             return Response.json({ error: "Failed to get fact" }, { status: 500, headers });
@@ -51,7 +57,10 @@ export class FactsController {
             }
 
             return Response.json(facts, {
-                headers
+                headers: {
+                    ...headers,
+                    "Cache-Control": "public, max-age=3600",
+                }
             });
         } catch (error) {
             return Response.json({ error: "Failed to get facts" }, { status: 500, headers });
