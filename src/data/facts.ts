@@ -4,11 +4,12 @@ import type { Fact } from "../types/Fact";
 import { animalFacts } from "./categories/animals";
 import { astronomyFacts } from "./categories/astronomy";
 import { biologyFacts } from "./categories/biology";
+import { globalWarmingFacts } from "./categories/globalWarming";
 import { historyFacts } from "./categories/history";
 import { physicsFacts } from "./categories/physics";
 import { technologyFacts } from "./categories/technology";
 
-const allFacts: Fact[] = [...animalFacts, ...astronomyFacts, ...biologyFacts, ...historyFacts, ...physicsFacts, ...technologyFacts]
+const allFacts: Fact[] = [...animalFacts, ...astronomyFacts, ...biologyFacts, ...historyFacts, ...physicsFacts, ...technologyFacts, ...globalWarmingFacts]
 
 export const facts: Fact[] = [
 ];
